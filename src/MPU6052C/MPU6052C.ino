@@ -7,10 +7,10 @@ HINT: Before running this program, try testing an I2C Scanner located in the fol
 This program interfaces with the MPU6052C I2C device and reads basic accelerometer and gyro data to the serial
 =============Sources==============
 
-
+// HERE IS THE LIBRARY WE ARE USING:
 https://github.com/ElectronicCats/mpu6050/wiki
 
-// UPDATE: we cannot use this library as we have a MPU60502C, but still could be a useful reference
+// UPDATE: we cannot use the library below as we have a MPU60502C, but still could be a useful reference
 MPU 6050 Adafruit library:
 https://adafruit.github.io/Adafruit_MPU6050/html/class_adafruit___m_p_u6050.html
 
@@ -40,11 +40,28 @@ MPU6050 mpu;
 // The Serial data transfer rate in Baud (number of signal changes per second).
 // works well at 8Mhz/16Mhz
 #define BAUD_RATE 38400
-// The  Accelerometer range we are using
-#define ACCEL_RANGE MPU6050_RANGE_8_G
+
+// --- USER CONFIGURATION ---
+
+// 1. Set the Range 
+// Options: MPU6050_ACCEL_FS_2, MPU6050_ACCEL_FS_4, MPU6050_ACCEL_FS_8, MPU6050_ACCEL_FS_16
+#define ACCEL_RANGE     MPU6050_ACCEL_FS_8   
+
+// 2. Set the matching Scale Factor 
+// (See table below to choose correct value!)
+float accel_scale = 4096.0; 
+
+// 3. Set Gyro Range 
+// Options: MPU6050_GYRO_FS_250, MPU6050_GYRO_FS_500, MPU6050_GYRO_FS_1000, MPU6050_GYRO_FS_2000
+#define GYRO_RANGE      MPU6050_GYRO_FS_500
+
+// 4. Set matching Gyro Scale Factor 
+// (See table below!)
+float gyro_scale = 65.5; 
+
 
 // how often (in ms) we grab data from the MPU
-#define DELAY_INTERVAL 500
+#define DELAY_INTERVAL 100
 
 
 // the bytes to read our data into:
@@ -95,13 +112,23 @@ void setup()
   Serial.println("MPU6052C Set Up!");
 
   // let's set the current accelerometer range by interfacing with our device
-  //mpu.setAccelerometerRange(ACCEL_RANGE);
+  mpu.setFullScaleAccelRange(ACCEL_RANGE);
+  mpu.setFullScaleGyroRange(GYRO_RANGE);
 
-
-
-
-
-
+// ==========================================================
+  // >>> PASTE YOUR OFFSET NUMBERS HERE <<<
+  // Use the numbers from the end of the IMU_Zero script output
+  // ==========================================================
+  mpu.setXAccelOffset(0);   // <-- Replace 0 with your Value
+  mpu.setYAccelOffset(0);   // <-- Replace 0 with your Value
+  mpu.setZAccelOffset(0);   // <-- Replace 0 with your Value
+  
+  mpu.setXGyroOffset(0);    // <-- Replace 0 with your Value
+  mpu.setYGyroOffset(0);    // <-- Replace 0 with your Value
+  mpu.setZGyroOffset(0);    // <-- Replace 0 with your Value
+  // ==========================================================
+  
+  Serial.println("MPU Configured and Calibrated!");
 }
 
 // Everything that the Arduino needs to repetitively, constantly
@@ -112,13 +139,25 @@ void loop()
   // (&) it accepts the values passed by reference (as a pointer). This edits them directly, as opposed to passing a copy
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-  // print out the values to the serial, tab-seperated
-  Serial.print(ax); Serial.print("\t");
-  Serial.print(ay); Serial.print("\t");
-  Serial.print(az); Serial.print("\t");
-  Serial.print(gx); Serial.print("\t");
-  Serial.print(gy); Serial.print("\t");
-  Serial.println(gz);
+// 3. Convert raw integers to real units (float)
+  float accelX_g = ax / accel_scale;
+  float accelY_g = ay / accel_scale;
+  float accelZ_g = az / accel_scale;
+
+  float gyroX_ds = gx / gyro_scale;
+  float gyroY_ds = gy / gyro_scale;
+  float gyroZ_ds = gz / gyro_scale;
+
+// 4. Print readable values
+  Serial.print("Accel (g): ");
+  Serial.print(accelX_g); Serial.print("\t");
+  Serial.print(accelY_g); Serial.print("\t");
+  Serial.print(accelZ_g); 
+  
+  Serial.print("\t | \tGyro (deg/s): ");
+  Serial.print(gyroX_ds); Serial.print("\t");
+  Serial.print(gyroY_ds); Serial.print("\t");
+  Serial.println(gyroZ_ds);
 
   delay(DELAY_INTERVAL);
 
