@@ -25,6 +25,11 @@ A5 -> SCL
 
 */
 
+#include <Arduino.h>
+
+// Calibration Parameters
+#include "imu_config.h"
+
 // Import the Arduino I2C library because the MPU6050 is an I2C device
 #include <Wire.h>
 
@@ -36,6 +41,8 @@ A5 -> SCL
 // default I2C address is 0x68
 MPU6050 mpu;
 
+void checkWhoAmI();
+
 // Program constants
 // The Serial data transfer rate in Baud (number of signal changes per second).
 // works well at 8Mhz/16Mhz
@@ -43,26 +50,24 @@ MPU6050 mpu;
 
 // --- USER CONFIGURATION ---
 
-// 1. Set the Range 
+// 1. Set the Range
 // Options: MPU6050_ACCEL_FS_2, MPU6050_ACCEL_FS_4, MPU6050_ACCEL_FS_8, MPU6050_ACCEL_FS_16
-#define ACCEL_RANGE     MPU6050_ACCEL_FS_8   
+#define ACCEL_RANGE MPU6050_ACCEL_FS_8
 
-// 2. Set the matching Scale Factor 
+// 2. Set the matching Scale Factor
 // (See table below to choose correct value!)
-float accel_scale = 4096.0; 
+float accel_scale = 4096.0;
 
-// 3. Set Gyro Range 
+// 3. Set Gyro Range
 // Options: MPU6050_GYRO_FS_250, MPU6050_GYRO_FS_500, MPU6050_GYRO_FS_1000, MPU6050_GYRO_FS_2000
-#define GYRO_RANGE      MPU6050_GYRO_FS_500
+#define GYRO_RANGE MPU6050_GYRO_FS_500
 
-// 4. Set matching Gyro Scale Factor 
+// 4. Set matching Gyro Scale Factor
 // (See table below!)
-float gyro_scale = 65.5; 
-
+float gyro_scale = 65.5;
 
 // how often (in ms) we grab data from the MPU
 #define DELAY_INTERVAL 100
-
 
 // the bytes to read our data into:
 // accelerometer
@@ -76,7 +81,8 @@ void setup()
   Serial.begin(BAUD_RATE);
 
   // Let's wait for the serial to be setup before proceeding
-  while(!Serial) delay(10);
+  while (!Serial)
+    delay(10);
 
   // Initialize and enable I2C on arduino
   Wire.begin();
@@ -84,30 +90,13 @@ void setup()
   // works best at 100kHz
   Wire.setClock(100000);
 
-
   // Initialize the MPU 6050
   mpu.initialize();
 
-  mpu.setSleepEnabled(false);          // Clear sleep bit
+  mpu.setSleepEnabled(false);                  // Clear sleep bit
   mpu.setClockSource(MPU6050_CLOCK_PLL_XGYRO); // Select X gyro as clock
 
   delay(100);
-
-  // Testing the connection won't work because this is an MPU6052C 
-
-  // if(!mpu.testConnection())
-  // {
-  //   Serial.println("Failed to find MPU6050 chip!");
-
-  //   checkWhoAmI();
-    
-  //   while(1) {
-  //     // enter an infinite loop
-  //     delay(10);
-  //   }
-  // }
-
-  // assume we are connected
 
   Serial.println("MPU6052C Set Up!");
 
@@ -115,19 +104,19 @@ void setup()
   mpu.setFullScaleAccelRange(ACCEL_RANGE);
   mpu.setFullScaleGyroRange(GYRO_RANGE);
 
-// ==========================================================
+  // ==========================================================
   // >>> PASTE YOUR OFFSET NUMBERS HERE <<<
   // Use the numbers from the end of the IMU_Zero script output
   // ==========================================================
-  mpu.setXAccelOffset(0);   // <-- Replace 0 with your Value
-  mpu.setYAccelOffset(0);   // <-- Replace 0 with your Value
-  mpu.setZAccelOffset(0);   // <-- Replace 0 with your Value
-  
-  mpu.setXGyroOffset(0);    // <-- Replace 0 with your Value
-  mpu.setYGyroOffset(0);    // <-- Replace 0 with your Value
-  mpu.setZGyroOffset(0);    // <-- Replace 0 with your Value
+  mpu.setXAccelOffset(X_ACCEL_OFFSET); // <-- Replace 0 with your Value
+  mpu.setYAccelOffset(Y_ACCEL_OFFSET); // <-- Replace 0 with your Value
+  mpu.setZAccelOffset(Z_ACCEL_OFFSET); // <-- Replace 0 with your Value
+
+  mpu.setXGyroOffset(X_GYRO_OFFSET); // <-- Replace 0 with your Value
+  mpu.setYGyroOffset(Y_GYRO_OFFSET); // <-- Replace 0 with your Value
+  mpu.setZGyroOffset(Z_GYRO_OFFSET); // <-- Replace 0 with your Value
   // ==========================================================
-  
+
   Serial.println("MPU Configured and Calibrated!");
 }
 
@@ -135,11 +124,11 @@ void setup()
 void loop()
 {
 
-  // each line will read 14 bytes from registor 0x3B. 
+  // each line will read 14 bytes from registor 0x3B.
   // (&) it accepts the values passed by reference (as a pointer). This edits them directly, as opposed to passing a copy
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-// 3. Convert raw integers to real units (float)
+  // 3. Convert raw integers to real units (float)
   float accelX_g = ax / accel_scale;
   float accelY_g = ay / accel_scale;
   float accelZ_g = az / accel_scale;
@@ -148,32 +137,35 @@ void loop()
   float gyroY_ds = gy / gyro_scale;
   float gyroZ_ds = gz / gyro_scale;
 
-// 4. Print readable values
+  // 4. Print readable values
   Serial.print("Accel (g): ");
-  Serial.print(accelX_g); Serial.print("\t");
-  Serial.print(accelY_g); Serial.print("\t");
-  Serial.print(accelZ_g); 
-  
+  Serial.print(accelX_g);
+  Serial.print("\t");
+  Serial.print(accelY_g);
+  Serial.print("\t");
+  Serial.print(accelZ_g);
+
   Serial.print("\t | \tGyro (deg/s): ");
-  Serial.print(gyroX_ds); Serial.print("\t");
-  Serial.print(gyroY_ds); Serial.print("\t");
+  Serial.print(gyroX_ds);
+  Serial.print("\t");
+  Serial.print(gyroY_ds);
+  Serial.print("\t");
   Serial.println(gyroZ_ds);
 
   delay(DELAY_INTERVAL);
-
 }
-
 
 void checkWhoAmI()
 {
-  
+
   // check WHOAMI manually
   Wire.beginTransmission(0x68);
-  Wire.write(0x75);  // WHO_AM_I
+  Wire.write(0x75); // WHO_AM_I
   Wire.endTransmission(false);
   Wire.requestFrom(0x68, 1);
 
-  if (Wire.available()) {
+  if (Wire.available())
+  {
     byte whoami = Wire.read();
     Serial.print("WHO_AM_I = 0x");
     Serial.println(whoami, HEX);
