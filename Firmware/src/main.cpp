@@ -23,12 +23,14 @@ https://adafruit.github.io/Adafruit_MPU6050/html/class_adafruit___m_p_u6050.html
 #include "IMU.h"
 #include "Motor.h"
 
+#include <PID_v2.h>
+
 // Program constants
 // The Serial data transfer rate in Baud (number of signal changes per second).
 // works well at 8Mhz/16Mhz
 #define BAUD_RATE 38400
 
-#define DELAY_INTERVAL 2000
+#define DELAY_INTERVAL 10
 
 // Create our IMU
 IMU imu;
@@ -36,6 +38,10 @@ IMU imu;
 // Create two motor objects
 Motor leftMotor(EN_A, IN_1, IN_2);
 Motor rightMotor(EN_B, IN_3, IN_4);
+
+// create PID
+double Kp = 15.0, Ki = 0.5, Kd = 0.2;
+PID_v2 myPID(Kp, Ki, Kd, PID::Reverse);
 
 // One-time actions to initialize and configure I2C devices and Arduino
 void setup()
@@ -56,22 +62,31 @@ void setup()
 
   leftMotor.begin();
   rightMotor.begin();
+
+  // Read first
+  imu.read();
+  // --- Allow negative motor speeds! ---
+  myPID.SetOutputLimits(-255.0, 255.0);
+
+  // PID
+
+  myPID.Start(imu.getPitch(),
+              0, // current output
+              0  // setpoint
+  );
 }
 
 // Everything that the Arduino needs to repetitively, constantly
 void loop()
 {
   imu.read();
-  imu.print();
+  // imu.print();
+  float pitch = imu.getPitch();
 
-  // Drive forward at half the speed
-  leftMotor.drive(128);
-  rightMotor.drive(128);
-  delay(100);
+  float output = myPID.Run(pitch);
 
-  // reverse full speed
-  leftMotor.drive(-255);
-  rightMotor.drive(-255);
+  leftMotor.drive(output);
+  rightMotor.drive(output);
 
-  delay(100);
+  delay(DELAY_INTERVAL);
 }

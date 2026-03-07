@@ -17,7 +17,7 @@
 // 2. Set the matching Scale Factor
 // (See table below to choose correct value!)
 // MUST BE FLOAT (f)
-#define ACCEL_SCALE 4096.0f
+constexpr float ACCEL_SCALE = 1.0f / 4096.0f;
 
 // 3. Set Gyro Range
 // Options: MPU6050_GYRO_FS_250, MPU6050_GYRO_FS_500, MPU6050_GYRO_FS_1000, MPU6050_GYRO_FS_2000
@@ -25,6 +25,6 @@
 
 // 4. Set matching Gyro Scale Factor
 // (See table below!)
-#define GYRO_SCALE 65.5f
+constexpr float GYRO_SCALE = 1.0f / 65.5f;
 
 #endif

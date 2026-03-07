@@ -28,9 +28,12 @@ struct Vec3D
     float z;
 };
 
-class IMU : public MPU6050
+class IMU
 {
 private:
+    // our IMU sensor device
+    MPU6050 mpu;
+
     // the bytes to read our data into:
     RawIMU raw;
 
@@ -47,7 +50,10 @@ public:
     void begin();
 
     // accessors
+    Vec3D getAccel() const;
+    Vec3D getGyro() const;
 
+    float getPitch() const;
     void print() const;
     // mutators
     void read();

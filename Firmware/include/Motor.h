@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-enum MotorDirection
+enum class MotorDirection
 {
     REVERSE = -1,
     STOP,
@@ -18,8 +18,8 @@ private:
     uint8_t in2Pin;
 
     // the previous and current directions of the motor
-    MotorDirection newDir{STOP};
-    MotorDirection currDir{STOP};
+    MotorDirection newDir{MotorDirection::STOP};
+    MotorDirection currDir{MotorDirection::STOP};
 
 public:
     // constructor sets up the pins

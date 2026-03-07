@@ -26,19 +26,19 @@ void Motor::drive(int16_t speed)
         */
         switch (newDir)
         {
-        case FORWARD:
+        case MotorDirection::FORWARD:
         {
             digitalWrite(in1Pin, LOW);
             digitalWrite(in2Pin, HIGH);
             break;
         }
-        case REVERSE:
+        case MotorDirection::REVERSE:
         {
             digitalWrite(in1Pin, HIGH);
             digitalWrite(in2Pin, LOW);
             break;
         }
-        case STOP:
+        case MotorDirection::STOP:
         { // speed = 0
             stop();
         }
