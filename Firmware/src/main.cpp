@@ -46,47 +46,48 @@ PID_v2 myPID(Kp, Ki, Kd, PID::Reverse);
 // One-time actions to initialize and configure I2C devices and Arduino
 void setup()
 {
-  Serial.begin(BAUD_RATE);
+    Serial.begin(BAUD_RATE);
 
-  // Let's wait for the serial to be setup before proceeding
-  while (!Serial)
-    delay(10);
+    // Let's wait for the serial to be setup before proceeding
+    while (!Serial)
+        delay(10);
 
-  // Initialize and enable I2C on arduino
-  Wire.begin();
+    // Initialize and enable I2C on arduino
+    Wire.begin();
 
-  // works best at 100kHz
-  Wire.setClock(100000);
+    // works best at 100kHz
+    Wire.setClock(100000);
 
-  imu.begin();
+    imu.begin();
 
-  leftMotor.begin();
-  rightMotor.begin();
+    leftMotor.begin();
+    rightMotor.begin();
 
-  // Read first
-  imu.read();
-  // --- Allow negative motor speeds! ---
-  myPID.SetOutputLimits(-255.0, 255.0);
+    // Read first
+    imu.read();
+    // --- Allow negative motor speeds! ---
+    myPID.SetOutputLimits(-255.0, 255.0);
 
-  // PID
+    // PID
 
-  myPID.Start(imu.getPitch(),
-              0, // current output
-              0  // setpoint
-  );
+    myPID.Start(imu.getPitch(),
+                0, // current output
+                0  // setpoint
+    );
 }
 
 // Everything that the Arduino needs to repetitively, constantly
 void loop()
 {
-  imu.read();
-  // imu.print();
-  float pitch = imu.getPitch();
+    imu.read();
+    // imu.print();
+    float pitch = imu.getPitch();
 
-  float output = myPID.Run(pitch);
+    float output = myPID.Run(pitch);
 
-  leftMotor.drive(output);
-  rightMotor.drive(output);
+    leftMotor.drive(output);
+    rightMotor.drive(output);
 
-  delay(DELAY_INTERVAL);
+    delay(DELAY_INTERVAL);
 }
+
