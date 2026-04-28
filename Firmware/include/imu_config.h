@@ -27,4 +27,8 @@ constexpr float ACCEL_SCALE = 1.0f / 4096.0f;
 // (See table below!)
 constexpr float GYRO_SCALE = 1.0f / 65.5f;
 
+// Sensor fusion factor ALPHA (Complementary filter)
+
+static constexpr float ALPHA = 0.98f;
+
 #endif

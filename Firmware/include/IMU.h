@@ -43,6 +43,9 @@ private:
     // gyroscope data
     Vec3D gyro_deg_s;
 
+    // Pitch
+    float pitch;
+
 public:
     // use
     IMU() = default;

@@ -37,7 +37,7 @@ Vec3D IMU::getGyro() const
     return gyro_deg_s;
 }
 
-float IMU::getPitch() const
+float IMU::getAccelPitch() const
 {
     // calculate angle from acceleremator
     return atan2(accel_g.x, accel_g.z) * 180.0 / PI;
@@ -75,5 +75,24 @@ void IMU::read()
     gyro_deg_s = {
         raw.gx * GYRO_SCALE,
         raw.gy * GYRO_SCALE,
-        raw.gz * GYRO_SCALE};
+        raw.gz * GYRO_SCALE
+    };
+
+    // Complementary filter
+
+    unsigned long now = millis();
+    float dt = (now - lastTime) / 1000.0f;
+    lastTime = now;
+
+    float accelPitch = getAccelPitch();
+
+    // theta = alpha * theta_omega (gyroscope) + (1 - alpha) * theta accelerometer
+    // https://ahrs.readthedocs.io/en/latest/filters/complementary.html
+    pitch = ALPHA * (pitch + gyro_deg_s.y) * dt + (1.0f - ALPHA) * accelPitch;
+    
 }
+
+ float IMU::getPitch() const
+ {
+    return pitch;
+ }

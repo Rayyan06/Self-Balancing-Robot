@@ -204,7 +204,7 @@ void GetSmoothed()
   {
     mpu.getMotion6(&RawValue[iAx], &RawValue[iAy], &RawValue[iAz], &RawValue[iGx], &RawValue[iGy], &RawValue[iGz]);
     // Small optimization: remove delay to speed up convergence
-    // delayMicroseconds(usDelay);
+    delayMicroseconds(usDelay);
     for (int j = 0; j <= 5; j++)
       Sums[j] = Sums[j] + RawValue[j];
   }

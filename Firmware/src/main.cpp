@@ -99,6 +99,7 @@ void loop()
 {
 
     imu.read();
+    
     // imu.print();
     float pitch = imu.getPitch();
 
