@@ -1,87 +1,53 @@
-// Motor A connections
-int enA = 9;
-int in1 = 8;
-int in2 = 7;
-// Motor B connections
-int enB = 3;
-int in3 = 5;
-int in4 = 4;
+#include "pinout.h"
+#include "Arduino.h"
 
-void setup() {
-  // Set all the motor control pins to outputs
-  pinMode(enA, OUTPUT);
-  pinMode(enB, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+// Note: Use your existing Motor library class,
+// or if that fails, simply use pinMode/digitalWrite/analogWrite directly.
 
-  // Turn off motors - Initial state
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+void setup()
+{
+  // Motor A pins
+  pinMode(EN_A, OUTPUT);
+  pinMode(IN_1, OUTPUT);
+  pinMode(IN_2, OUTPUT);
+
+  // Motor B pins
+  pinMode(EN_B, OUTPUT);
+  pinMode(IN_3, OUTPUT);
+  pinMode(IN_4, OUTPUT);
+
+  // Set Speed (0-255)
+  analogWrite(EN_A, 150);
+  analogWrite(EN_B, 150);
 }
 
-void loop() {
-  directionControl();
-  delay(1000);
-  speedControl();
-  delay(1000);
-}
-
-// This function lets you control spinning direction of motors
-void directionControl() {
-  // Set motors to maximum speed
-  digitalWrite(enA, HIGH);
-  digitalWrite(enB, HIGH);
-
-  // Turn on motor A & B
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+void loop()
+{
+  // --- FORWARD ---
+  digitalWrite(IN_1, HIGH);
+  digitalWrite(IN_2, LOW);
+  digitalWrite(IN_3, HIGH);
+  digitalWrite(IN_4, LOW);
   delay(2000);
 
-  // Now change motor directions
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
+  // --- STOP ---
+  digitalWrite(IN_1, LOW);
+  digitalWrite(IN_2, LOW);
+  digitalWrite(IN_3, LOW);
+  digitalWrite(IN_4, LOW);
+  delay(1000);
+
+  // --- BACKWARD ---
+  digitalWrite(IN_1, LOW);
+  digitalWrite(IN_2, HIGH);
+  digitalWrite(IN_3, LOW);
+  digitalWrite(IN_4, HIGH);
   delay(2000);
 
-  // Turn off motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
-}
-
-// This function lets you control speed of the motors
-void speedControl() {
-  // Turn on motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-
-  // Accelerate from zero to maximum speed
-  for (int i = 0; i < 256; i++) {
-    analogWrite(enA, i);
-    analogWrite(enB, i);
-    delay(20);
-  }
-
-  // Decelerate from maximum speed to zero
-  for (int i = 255; i >= 0; --i) {
-    analogWrite(enA, i);
-    analogWrite(enB, i);
-    delay(20);
-  }
-
-  // Now turn off motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+  // --- STOP ---
+  digitalWrite(IN_1, LOW);
+  digitalWrite(IN_2, LOW);
+  digitalWrite(IN_3, LOW);
+  digitalWrite(IN_4, LOW);
+  delay(1000);
 }

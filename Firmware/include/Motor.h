@@ -17,6 +17,8 @@ private:
     uint8_t in1Pin;
     uint8_t in2Pin;
 
+    uint8_t deadSpeedRange;
+
     // the previous and current directions of the motor
     MotorDirection newDir{MotorDirection::STOP};
     MotorDirection currDir{MotorDirection::STOP};
@@ -30,6 +32,8 @@ public:
 
     // speed is from -255 (full reverse) to 255 (full forward)
     void drive(int16_t speed);
+
+    void setDeadband(uint8_t deadbandRange);
 
     // shutdown the motors
     void stop();

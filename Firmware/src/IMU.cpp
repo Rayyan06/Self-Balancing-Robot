@@ -40,7 +40,7 @@ Vec3D IMU::getGyro() const
 float IMU::getPitch() const
 {
     // calculate angle from acceleremator
-    return atan2(accel_g.y, accel_g.z) * 180.0 / PI;
+    return atan2(accel_g.x, accel_g.z) * 180.0 / PI;
 }
 
 void IMU::print() const

@@ -12,6 +12,15 @@ void Motor::begin()
 
 void Motor::drive(int16_t speed)
 {
+    // if (speed > 0)
+    // {
+    //     speed += deadSpeedRange;
+    // }
+    // else if (speed < 0)
+    // {
+    //     speed -= deadSpeedRange;
+    // }
+
     // limit speed to safe PWM limits
     speed = constrain(speed, -255, 255);
 
@@ -41,14 +50,19 @@ void Motor::drive(int16_t speed)
         case MotorDirection::STOP:
         { // speed = 0
             stop();
+            break;
         }
-            currDir = newDir;
         }
-
-        analogWrite(enPin, abs(speed));
+        currDir = newDir;
     }
+
+    analogWrite(enPin, abs(speed));
 }
 
+void Motor::setDeadband(uint8_t deadbandRange)
+{
+    this->deadSpeedRange = deadbandRange;
+}
 void Motor::stop()
 {
     digitalWrite(in1Pin, LOW);

@@ -85,6 +85,24 @@ void loop()
 
     float output = myPID.Run(pitch);
 
+    // // --- DEBUGGING BLOCK ---
+    // // Print these at a slower rate so the Serial Monitor isn't flooded
+    // static unsigned long lastDebugTime = 0;
+    // if (millis() - lastDebugTime > 100)
+    // { // Print every 100ms
+    //     Serial.print("Pitch: ");
+    //     Serial.print(pitch);
+    //     Serial.print(" | Output: ");
+    //     Serial.println(output);
+
+    //     // If output is 0, check if the PID is actually running
+    //     if (output == 0)
+    //     {
+    //         Serial.println("Warning: PID output is zero!");
+    //     }
+    //     lastDebugTime = millis();
+    // }
+    // -----------------------
     leftMotor.drive(output);
     rightMotor.drive(output);
 
